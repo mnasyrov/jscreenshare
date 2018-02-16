@@ -17,10 +17,14 @@ import java.util.concurrent.*;
 
 /**
  * Server command line:
+ * <pre>
  * java -jar jscreenshare -Djss.server=true [-Djss.serverPort=12345] [-Djss.rmiPort=12346]
- *
+ * </pre>
+ * <p>
  * Client command line:
- * java -jar jscreenshare -Djss.serverHost=HOSTNAME [-Djss.serverPort=12345] [-Djss.rmiPort=12346]
+ * <pre>
+ * java -jar jscreenshare -Djss.serverHost=HOSTNAME [-Djss.serverPort=12345] [-Djss.rmiPort=12346] [-Djss.refreshPeriod=5]
+ * </pre>
  */
 public class JScreenShare {
     private static final boolean isServer = Boolean.getBoolean("jss.server");
@@ -29,8 +33,7 @@ public class JScreenShare {
     private static final int serverPort = Integer.getInteger("jss.serverPort", 12345);
     private static final int rmiPort = Integer.getInteger("jss.rmiPort", 0);
     private static final String rmiServerObjName = System.getProperty("jss.rmiServerObjName", "ScreenServer");
-    private static final String appName = isServer ? "Server" : "Client";
-
+    private static final int refreshPeriod = Integer.getInteger("jss.refreshPeriod", 0); // seconds, 0 is disabled
 
     public static void main(String[] args) throws Exception {
         if (isServer) {
@@ -47,7 +50,8 @@ public class JScreenShare {
             ClientUi clientUi = new ClientUi(remoteScreen);
             clientUi.run();
         }
-        System.out.println(appName + " is run.");
+
+        System.out.println((isServer ? "Server" : "Client") + " is run.");
     }
 
 
@@ -77,9 +81,13 @@ public class JScreenShare {
             frame.pack();
             frame.setVisible(true);
 
-//            ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-//            ScheduledFuture<?> future = executor.scheduleWithFixedDelay(this::showScreenShot, 0, 1, TimeUnit.SECONDS);
-//            future.get();
+            if (refreshPeriod > 0) {
+                ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+                ScheduledFuture<?> future = executor.scheduleWithFixedDelay(
+                        this::showScreenShot, 0, refreshPeriod, TimeUnit.SECONDS
+                );
+                future.get();
+            }
         }
 
         private void showScreenShot() throws RuntimeException {
@@ -97,7 +105,6 @@ public class JScreenShare {
                 frame.pack();
                 frame.setVisible(true);
             }
-
             frame.repaint();
         }
     }
