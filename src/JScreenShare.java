@@ -1,6 +1,8 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
@@ -66,9 +68,18 @@ public class JScreenShare {
             frame.getContentPane().add(new JLabel(imageIcon));
             frame.setMinimumSize(new Dimension(640, 480));
 
-            ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-            ScheduledFuture<?> future = executor.scheduleWithFixedDelay(this::showScreenShot, 0, 1, TimeUnit.SECONDS);
-            future.get();
+            frame.getContentPane().addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    showScreenShot();
+                }
+            });
+            frame.pack();
+            frame.setVisible(true);
+
+//            ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+//            ScheduledFuture<?> future = executor.scheduleWithFixedDelay(this::showScreenShot, 0, 1, TimeUnit.SECONDS);
+//            future.get();
         }
 
         private void showScreenShot() throws RuntimeException {
