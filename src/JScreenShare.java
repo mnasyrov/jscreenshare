@@ -60,7 +60,7 @@ public class JScreenShare {
 
         void run() throws ExecutionException, InterruptedException {
             imageIcon = new ImageIcon();
-            frame = new JFrame();
+            frame = new JFrame("JScreenShare");
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             frame.getContentPane().setLayout(new FlowLayout());
             frame.getContentPane().add(new JLabel(imageIcon));
@@ -92,12 +92,12 @@ public class JScreenShare {
     }
 
 
-    interface RemoteScreen extends Remote {
+    public interface RemoteScreen extends Remote {
         byte[] takeScreenShotPng() throws IOException;
     }
 
 
-    static class ScreenServer implements RemoteScreen {
+    public static class ScreenServer implements RemoteScreen {
         private Robot robot;
 
         public ScreenServer() throws AWTException {
