@@ -20,7 +20,7 @@ import java.util.concurrent.*;
  * Client command line:
  * java -jar jscreenshare -Djss.serverHost=HOSTNAME [-Djss.serverPort=12345] [-Djss.rmiPort=12346]
  */
-public class Main {
+public class JScreenShare {
     private static final boolean isServer = Boolean.getBoolean("jss.server");
     private static final boolean isClient = !isServer;
     private static final String serverHost = System.getProperty("jss.serverHost", null);
