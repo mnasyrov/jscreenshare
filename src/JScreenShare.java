@@ -23,7 +23,7 @@ import java.util.concurrent.*;
  * <p>
  * Client command line:
  * <pre>
- * java -jar jscreenshare -Djss.serverHost=HOSTNAME [-Djss.serverPort=12345] [-Djss.refreshPeriod=5]
+ * java -jar jscreenshare -Djss.serverHost=HOSTNAME [-Djss.serverPort=12345] [-Djss.refreshPeriod=5] [-Djss.imageScale=true]
  * </pre>
  */
 public class JScreenShare {
@@ -34,6 +34,7 @@ public class JScreenShare {
     private static final int rmiPort = Integer.getInteger("jss.rmiPort", 0);
     private static final String rmiServerObjName = System.getProperty("jss.rmiServerObjName", "ScreenServer");
     private static final int refreshPeriod = Integer.getInteger("jss.refreshPeriod", 0); // seconds, 0 is disabled
+    private static final boolean imageScale = Boolean.getBoolean("jss.imageScale");
 
     public static void main(String[] args) throws Exception {
         if (isServer) {
@@ -54,9 +55,11 @@ public class JScreenShare {
 
 
     static class ClientUi {
+        private final RemoteScreen remoteScreen;
         private ImageIcon imageIcon;
         private JFrame frame;
-        private RemoteScreen remoteScreen;
+        private Container contentPane;
+        private BufferedImage screenShot;
 
         ClientUi(RemoteScreen remoteScreen) {
             this.remoteScreen = remoteScreen;
@@ -66,15 +69,20 @@ public class JScreenShare {
             imageIcon = new ImageIcon();
             frame = new JFrame("JScreenShare");
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            frame.getContentPane().add(new JLabel(imageIcon));
             frame.setMinimumSize(new Dimension(640, 480));
-            frame.getContentPane().addMouseListener(new MouseAdapter() {
+            contentPane = frame.getContentPane();
+            JLabel label = new JLabel(imageIcon);
+            label.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     showScreenShot();
                 }
             });
-            frame.pack();
+            if (imageScale) {
+                contentPane.add(label);
+            } else {
+                contentPane.add(new JScrollPane(label, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+            }
             frame.setVisible(true);
 
             if (refreshPeriod > 0) {
@@ -89,7 +97,8 @@ public class JScreenShare {
         }
 
         private void showScreenShot() throws RuntimeException {
-            BufferedImage screenShot;
+            boolean initialFrame = screenShot == null;
+
             try {
                 byte[] pngData = remoteScreen.takeScreenShotPng();
                 screenShot = ImageSerialization.fromPng(pngData);
@@ -97,11 +106,14 @@ public class JScreenShare {
                 throw new RuntimeException(e);
             }
 
-            boolean initFrame = imageIcon.getImage() == null;
-            imageIcon.setImage(screenShot);
-            if (initFrame) {
+            Image image = screenShot;
+            if (imageScale && !initialFrame) {
+                image = screenShot.getScaledInstance(contentPane.getWidth(), contentPane.getHeight(), Image.SCALE_AREA_AVERAGING);
+            }
+            imageIcon.setImage(image);
+
+            if (initialFrame) {
                 frame.pack();
-                frame.setVisible(true);
             }
             frame.repaint();
         }
