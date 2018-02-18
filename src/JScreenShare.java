@@ -18,12 +18,12 @@ import java.util.concurrent.*;
 /**
  * Server command line:
  * <pre>
- * java -jar jscreenshare -Djss.server=true [-Djss.serverPort=12345] [-Djss.rmiPort=12346]
+ * java -jar jscreenshare -Djss.server=true [-Djava.rmi.server.hostname=HOSTNAME] [-Djss.serverPort=12345]
  * </pre>
  * <p>
  * Client command line:
  * <pre>
- * java -jar jscreenshare -Djss.serverHost=HOSTNAME [-Djss.serverPort=12345] [-Djss.rmiPort=12346] [-Djss.refreshPeriod=5]
+ * java -jar jscreenshare -Djss.serverHost=HOSTNAME [-Djss.serverPort=12345] [-Djss.refreshPeriod=5]
  * </pre>
  */
 public class JScreenShare {
@@ -46,9 +46,7 @@ public class JScreenShare {
             Registry registry = LocateRegistry.getRegistry(serverHost, serverPort);
             RemoteScreen stub = (RemoteScreen) registry.lookup(rmiServerObjName);
             RemoteScreen remoteScreen = (RemoteScreen) UnicastRemoteObject.exportObject(stub, rmiPort);
-
-            ClientUi clientUi = new ClientUi(remoteScreen);
-            clientUi.run();
+            new ClientUi(remoteScreen).run();
         }
 
         System.out.println((isServer ? "Server" : "Client") + " is run.");
@@ -68,10 +66,8 @@ public class JScreenShare {
             imageIcon = new ImageIcon();
             frame = new JFrame("JScreenShare");
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            frame.getContentPane().setLayout(new FlowLayout());
             frame.getContentPane().add(new JLabel(imageIcon));
             frame.setMinimumSize(new Dimension(640, 480));
-
             frame.getContentPane().addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -87,6 +83,8 @@ public class JScreenShare {
                         this::showScreenShot, 0, refreshPeriod, TimeUnit.SECONDS
                 );
                 future.get();
+            } else {
+                showScreenShot();
             }
         }
 
