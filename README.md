@@ -7,7 +7,7 @@ Features:
 * Automatically sends screenshots from a server to a client.
 * No external dependencies.
 
-![Screenshot](docs/screenshot.png)
+<img alt="Screenshot" src="docs/screenshot.png" width="400" />
 
 
 ## Building
