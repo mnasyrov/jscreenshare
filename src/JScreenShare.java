@@ -22,7 +22,7 @@ public class JScreenShare {
     private static final int serverPort = Integer.getInteger("jss.port", 12345);
     private static final int rmiPort = Integer.getInteger("jss.rmiPort", 0);
     private static final String rmiServerObjName = System.getProperty("jss.rmiServerObjName", "ScreenServer");
-    private static final int refreshPeriod = Integer.getInteger("jss.refreshPeriod", 0); // seconds, 0 is disabled
+    private static final int refreshPeriod = Integer.getInteger("jss.refreshPeriod", 5); // seconds, 0 is disabled
     private static final boolean imageScale = Boolean.getBoolean("jss.imageScale");
 
     public static void main(String[] args) throws Exception {

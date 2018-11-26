@@ -4,8 +4,10 @@ A pure Java 8+ command-line tool for sharing a screen between computers.
 It's goal to be a minimalistic as possible.
 
 Features:
-* Send screenshots from a server to a client.
+* Automatically sends screenshots from a server to a client.
 * No external dependencies.
+
+![Screenshot](docs/screenshot.png)
 
 
 ## Building
@@ -43,7 +45,7 @@ System properties:
     * Enables server mode when it is `true`.
     
 * `jss.host` = `127.0.0.1` (optional):
-    * Server: The IP address which the server will listen. Specify `0.0.0.0` to listen all network interfaces.
+    * Server: IP address of the server to listen.
     * Client: Host name or IP address of the server to connect.
     
 * `jss.port` = `12345` (optional):
@@ -53,5 +55,5 @@ System properties:
 * `jss.refreshPeriod` = `5` (optional):
     * Client: If greater than `0` then the client refresh a server's screen once per the period.
         
-* `jss.imageScale` = `true` (optional):
+* `jss.imageScale` = `false` (optional):
     * Client: If enabled then a screenshot is resized to fill a client window. Otherwise, scrollbars are added to scroll the image.
