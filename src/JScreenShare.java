@@ -15,22 +15,11 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.*;
 
 
-/**
- * Server command line:
- * <pre>
- * java -jar jscreenshare -Djss.server=true [-Djava.rmi.server.hostname=HOSTNAME] [-Djss.serverPort=12345]
- * </pre>
- * <p>
- * Client command line:
- * <pre>
- * java -jar jscreenshare -Djss.serverHost=HOSTNAME [-Djss.serverPort=12345] [-Djss.refreshPeriod=5] [-Djss.imageScale=true]
- * </pre>
- */
 public class JScreenShare {
     private static final boolean isServer = Boolean.getBoolean("jss.server");
     private static final boolean isClient = !isServer;
-    private static final String serverHost = System.getProperty("jss.serverHost", null);
-    private static final int serverPort = Integer.getInteger("jss.serverPort", 12345);
+    private static final String serverHost = System.getProperty("jss.host", "127.0.0.1");
+    private static final int serverPort = Integer.getInteger("jss.port", 12345);
     private static final int rmiPort = Integer.getInteger("jss.rmiPort", 0);
     private static final String rmiServerObjName = System.getProperty("jss.rmiServerObjName", "ScreenServer");
     private static final int refreshPeriod = Integer.getInteger("jss.refreshPeriod", 0); // seconds, 0 is disabled
@@ -39,6 +28,7 @@ public class JScreenShare {
     public static void main(String[] args) throws Exception {
         if (isServer) {
             ScreenServer screenServer = new ScreenServer();
+            System.setProperty("java.rmi.server.hostname", serverHost);
             RemoteScreen stub = (RemoteScreen) UnicastRemoteObject.exportObject(screenServer, rmiPort);
             LocateRegistry.createRegistry(serverPort).bind(rmiServerObjName, stub);
         }

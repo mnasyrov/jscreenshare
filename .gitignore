@@ -3,3 +3,5 @@ Thumbs.db
 *.iml
 /.idea
 /out
+/build
+/jscreenshare.jar
